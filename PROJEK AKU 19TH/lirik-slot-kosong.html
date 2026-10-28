@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lirik Bunga</title>
+<link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Quicksand:wght@700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;overflow:hidden}
+body{font-family:'Quicksand',sans-serif;background:linear-gradient(180deg,#bfe9ff 0%,#e4f4ff 45%,#ffe3ee 100%);color:#8a4fa8}
+
+.sun{position:absolute;top:4%;right:6%;width:100px;height:100px;border-radius:50%;background:radial-gradient(circle,#fff7b0,#ffd96b);box-shadow:0 0 50px 20px #fff2a8aa;animation:pulse 4s ease-in-out infinite}
+.sun::before{content:"";position:absolute;inset:-24px;border-radius:50%;background:repeating-conic-gradient(#ffe88a99 0 8deg,transparent 8deg 24deg);-webkit-mask:radial-gradient(circle,transparent 52px,#000 53px);mask:radial-gradient(circle,transparent 52px,#000 53px);animation:spin 30s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes pulse{50%{transform:scale(1.07)}}
+
+.cloud{position:absolute;left:-220px;width:150px;height:46px;background:#fff;border-radius:50px;opacity:.9;filter:drop-shadow(0 6px 8px #b8d8f066);animation:drift linear infinite}
+.cloud::before,.cloud::after{content:"";position:absolute;background:#fff;border-radius:50%}
+.cloud::before{width:62px;height:62px;top:-30px;left:22px}
+.cloud::after{width:48px;height:48px;top:-20px;left:78px}
+@keyframes drift{to{transform:translateX(calc(100vw + 440px))}}
+
+.waves{position:absolute;left:0;right:0;bottom:0;height:24vh;z-index:2}
+.waves svg{position:absolute;bottom:0;width:200%;height:100%;animation:wave linear infinite}
+.waves svg:nth-child(1){animation-duration:14s;opacity:.55}
+.waves svg:nth-child(2){animation-duration:10s;opacity:.7;animation-direction:reverse}
+.waves svg:nth-child(3){animation-duration:7s;opacity:.9}
+@keyframes wave{to{transform:translateX(-50%)}}
+
+.flower{position:absolute;transform-origin:50% 100%;animation:sway ease-in-out infinite}
+@keyframes sway{0%,100%{transform:rotate(-7deg)}50%{transform:rotate(7deg)}}
+.petal{position:absolute;top:-30px;animation:fall linear infinite;opacity:.85}
+@keyframes fall{to{transform:translateY(110vh) rotate(540deg) translateX(60px)}}
+
+/* ===== ADEGAN PER LIRIK ===== */
+.stage{position:absolute;inset:0;z-index:5}
+.scene{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2vh;padding:0 5vw 10vh}
+.scene.out{animation:out .5s forwards}
+@keyframes out{to{opacity:0;transform:scale(.85) translateY(-20px)}}
+
+.frame{--s:min(36vh,250px);width:var(--s);height:var(--s);position:relative;animation:bloom 1.1s cubic-bezier(.2,1.3,.4,1) both}
+@keyframes bloom{from{transform:scale(0) rotate(calc(var(--dir)*-140deg));opacity:0}to{transform:none;opacity:1}}
+.photo{position:absolute;inset:15%;border:5px solid #fff;box-shadow:0 10px 28px #d79ad766;background:#ffd6e8 center/cover no-repeat;
+ border-radius:60% 40% 55% 45%/50% 60% 40% 50%;animation:morph 6s ease-in-out infinite}
+@keyframes morph{50%{border-radius:42% 58% 45% 55%/58% 42% 58% 42%}}
+.photo.noimg::after{content:"🌸";position:absolute;inset:0;display:grid;place-items:center;font-size:56px}
+
+.ring{position:absolute;inset:0;animation:spin 22s linear infinite}
+.ring.r2{animation-direction:reverse;animation-duration:30s}
+.ring i{position:absolute;font-style:normal;transform:translate(-50%,-50%);animation:wob 2.2s ease-in-out infinite}
+@keyframes wob{0%,100%{scale:.8}50%{scale:1.35}}
+.ring i{opacity:0;animation:pop .6s forwards,wob 2.2s ease-in-out infinite}
+@keyframes pop{to{opacity:1}}
+
+.lyric{min-height:14vh;text-align:center;font-family:'Pacifico',cursive;font-size:clamp(22px,5vw,46px);line-height:1.35;color:#8a4fa8;text-shadow:0 2px 0 #fff,0 0 18px #fff;max-width:900px}
+.lyric .w{display:inline-block;white-space:nowrap}
+.lyric .c{display:inline-block;opacity:0;animation:in .7s forwards,bob 2.4s ease-in-out infinite}
+@keyframes in{from{opacity:0;transform:translateY(30px) scale(.5)}to{opacity:1;transform:none}}
+@keyframes bob{0%,100%{translate:0 0}50%{translate:0 -9px}}
+
+.clock{position:absolute;z-index:10;top:18px;left:125px;font:700 13px 'Quicksand',sans-serif;color:#8a4fa8;background:#ffffffaa;border-radius:12px;padding:4px 10px}
+.btn{position:absolute;z-index:10;top:12px;left:12px;font:700 14px 'Quicksand',sans-serif;border:0;border-radius:20px;padding:10px 18px;cursor:pointer;color:#fff;background:linear-gradient(135deg,#ff9ec7,#c59bff);box-shadow:0 4px 10px #c59bff55}
+</style>
+</head>
+<body>
+<div class="sun"></div>
+<div id="bg"></div>
+<button class="btn" id="play">▶ Putar</button>
+<div class="clock" id="clock">0.0 dtk</div>
+<div class="stage" id="stage"></div>
+<div class="waves">
+ <svg viewBox="0 0 1200 200" preserveAspectRatio="none"><path fill="#a8dcff" d="M0 100C100 40 200 40 300 100S500 160 600 100 800 40 900 100s200 60 300 0V200H0Z"/></svg>
+ <svg viewBox="0 0 1200 200" preserveAspectRatio="none"><path fill="#ffc2dc" d="M0 120C100 70 200 70 300 120S500 170 600 120 800 70 900 120s200 50 300 0V200H0Z"/></svg>
+ <svg viewBox="0 0 1200 200" preserveAspectRatio="none"><path fill="#d9c2ff" d="M0 145C100 105 200 105 300 145S500 185 600 145 800 105 900 145s200 40 300 0V200H0Z"/></svg>
+</div>
+<audio id="audio" src="music.mpeg" preload="auto"></audio>
+
+<script>
+/* ============ EDIT BAGIAN INI ============
+   [detik_muncul, "teks lirik", "nama_foto"]
+   Taruh foto-fotomu satu folder dengan file ini.
+   Tempel lirik pilihanmu sendiri di slot di bawah. */
+const LYRICS = [
+  [0.2, "Please, please, please don't prove I'm right", "8.jpeg"],
+  [9, "And please, please, please", "6.jpeg"],
+  [12, "Don't bring me to tears when I just did my makeup so nice", "13.jpeg"],
+  [18, "Heartbreak is one thing (Heartbreak is one thing), my ego's another (Ego's another)", "9.jpeg"],
+  [22, "I beg you, don't embarrass me, motherfucker, oh", "14.jpeg"],
+  [30, "Please, please, please (Ah)", "12.jpeg"],
+  [37, "If you wanna go and be stupid don't", "3.jpeg"],
+  [41, "Do it in front of me", "1.jpeg"],
+  [46, "If you don't wanna cry to my music don't", "2.jpeg"],
+  [50, "Make me hate you prolifically", "5.jpeg"],
+  [55, "Please, please, please (Please)", "10.jpeg"],
+  [57, "Please, please, please (Please)", "4.jpeg"],
+  [60, "Please (Please), please (Please), please (Ah)", "7.jpeg"],
+];
+/* ========================================= */
+
+const $ = id => document.getElementById(id);
+const audio = $('audio'), stage = $('stage'), playBtn = $('play');
+let idx = -1, playing = false, hasAudio = true, t0 = 0, offset = 0;
+
+/* Dekorasi latar */
+const bg = $('bg');
+for (let i = 0; i < 4; i++) {
+  const c = document.createElement('div'); c.className = 'cloud';
+  c.style.cssText = `top:${5 + i * 11}%;transform:scale(${.7 + Math.random() * .7});animation-duration:${50 + i * 18}s;animation-delay:-${i * 22}s`;
+  bg.appendChild(c);
+}
+const fl = ['🌸','🌼','🌷','🌻','💮','🌺'];
+for (let i = 0; i < 16; i++) {
+  const f = document.createElement('div'); f.className = 'flower'; f.textContent = fl[i % 6];
+  f.style.cssText = `left:${i * 6.4 + Math.random() * 3}%;font-size:${30 + Math.random() * 30}px;bottom:${16 + Math.random() * 8}vh;animation-duration:${2.5 + Math.random() * 2.5}s;animation-delay:-${Math.random() * 4}s;z-index:${i % 2 ? 1 : 3}`;
+  bg.appendChild(f);
+}
+for (let i = 0; i < 14; i++) {
+  const p = document.createElement('div'); p.className = 'petal'; p.textContent = ['🌸','🌼','💮'][i % 3];
+  p.style.cssText = `left:${Math.random() * 100}%;font-size:${12 + Math.random() * 14}px;animation-duration:${9 + Math.random() * 9}s;animation-delay:-${Math.random() * 15}s`;
+  bg.appendChild(p);
+}
+
+/* Set bunga bergantian tiap adegan */
+const SETS = [['🌸','🌼','🌷'], ['🌺','🌻','💮'], ['🌷','🌸','🌼']];
+
+function ring(cls, set, n, radius, delayBase) {
+  const r = document.createElement('div'); r.className = 'ring ' + cls;
+  for (let i = 0; i < n; i++) {
+    const a = i / n * Math.PI * 2, e = document.createElement('i');
+    e.textContent = set[i % set.length];
+    e.style.cssText = `left:${50 + radius * Math.cos(a)}%;top:${50 + radius * Math.sin(a)}%;font-size:${cls ? 22 : 30}px;animation-delay:${delayBase + i * 0.06}s,${i * 0.18}s`;
+    r.appendChild(e);
+  }
+  return r;
+}
+
+function buildScene(k) {
+  const [, text, img] = LYRICS[k];
+  const dir = k % 2 ? 1 : -1, set = SETS[k % SETS.length];
+  const sc = document.createElement('div'); sc.className = 'scene';
+
+  const frame = document.createElement('div'); frame.className = 'frame'; frame.style.setProperty('--dir', dir);
+  const photo = document.createElement('div'); photo.className = 'photo';
+  if (img) {
+    const im = new Image();
+    im.onload = () => photo.style.backgroundImage = `url("${img}")`;
+    im.onerror = () => photo.classList.add('noimg');
+    im.src = img;
+  } else photo.classList.add('noimg');
+  frame.append(photo, ring('', set, 14, 46, .5), ring('r2', set.slice().reverse(), 10, 36, .8));
+  sc.appendChild(frame);
+
+  const ly = document.createElement('div'); ly.className = 'lyric';
+  let n = 0;
+  text.split(' ').forEach(word => {
+    const w = document.createElement('span'); w.className = 'w';
+    [...word].forEach(ch => {
+      const s = document.createElement('span'); s.className = 'c'; s.textContent = ch;
+      s.style.animationDelay = `${.8 + n * .045}s, ${n * .12}s`; n++;
+      w.appendChild(s);
+    });
+    ly.append(w, document.createTextNode(' '));
+  });
+  sc.appendChild(ly);
+  return sc;
+}
+
+function changeScene(k) {
+  stage.querySelectorAll('.scene:not(.out)').forEach(s => { s.classList.add('out'); setTimeout(() => s.remove(), 500); });
+  if (k >= 0 && LYRICS[k][1]) stage.appendChild(buildScene(k));
+}
+
+function now() { return hasAudio && !audio.paused ? audio.currentTime : offset + (performance.now() - t0) / 1000; }
+function tick() {
+  if (!playing) return;
+  $('clock').textContent = now().toFixed(1) + ' dtk';
+  const t = now(); let k = -1;
+  for (let i = 0; i < LYRICS.length; i++) if (t >= LYRICS[i][0]) k = i;
+  if (k !== idx) { idx = k; changeScene(k); }
+  requestAnimationFrame(tick);
+}
+function start() {
+  playing = true; idx = -1; playBtn.textContent = '⏸ Jeda';
+  audio.play().then(() => hasAudio = true).catch(() => hasAudio = false);
+  t0 = performance.now(); offset = audio.currentTime || 0; tick();
+}
+function pause() { playing = false; audio.pause(); offset = now(); playBtn.textContent = '▶ Putar'; }
+playBtn.onclick = () => playing ? pause() : start();
+audio.onerror = () => hasAudio = false;
+audio.onended = () => { playing = false; playBtn.textContent = '↺ Ulang'; audio.currentTime = 0; offset = 0; };
+</script>
+</body>
+</html>
